@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MyNewsChoice</string>
+    <string name="action_settings">Settings</string>
+    <string name="topic_name">Topic :</string>
+    <string name="frequency">Frequency :</string>
+    <string name="add_news_button">Generate News</string>
+</resources>
