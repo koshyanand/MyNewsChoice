@@ -1,11 +1,13 @@
-package com.kojen.mynewschoice;
+package com.kojen.mynewschoice.ui;
 
-import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +16,22 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.kojen.mynewschoice.R;
+import com.kojen.mynewschoice.adapter.MainAdapter;
+import com.kojen.mynewschoice.pojo.MetaInfo;
+import com.kojen.mynewschoice.util.Constants;
+import com.kojen.mynewschoice.util.Util;
+
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
+    RecyclerView mRecyclerView;
+    GridLayoutManager mGridLayoutManager;
+    ProgressBar mProgressBar;
+    MainAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,32 +39,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mGridLayoutManager = new GridLayoutManager(this, 2);
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
+        List<MetaInfo> metaInfoList = Util.getMetaInfoList(this);
+        adapter = new MainAdapter(this, metaInfoList);
+        mRecyclerView.setAdapter(adapter);
 
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        mProgressBar.setVisibility(View.INVISIBLE);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-                LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                View layout = inflater.inflate(R.layout.add_news, (ViewGroup) findViewById(R.id.liner_layout));
-                final EditText topicName = (EditText) layout.findViewById(R.id.topic_edit);
-                final EditText frequencyCount = (EditText) layout.findViewById(R.id.frequency_edit);
-                final Button addNewsButton = (Button) layout.findViewById(R.id.add_news_button);
-
-                addNewsButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(MainActivity.this, "Clicked on topic: " + topicName.getText() + " frequency : " + frequencyCount.getText(), Toast.LENGTH_LONG).show();
-
-                    }
-                });
-
-                //Building dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setView(layout);
-                AlertDialog dialog = builder.create();
-                dialog.show();
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                SharedPreferences.Editor edit = sharedPreferences.edit();
+                edit.remove(Constants.META_INFO_LIST);
+                edit.apply();
+                MainActivity.this.recreate();
             }
         });
     }
